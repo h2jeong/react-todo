@@ -1,26 +1,19 @@
-import React, { Component } from "react";
+import React from "react";
 
-class UserList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  render() {
-    console.log("UserList rendered", this.props);
-
-    let userList = [];
-    if (this.props.users && this.props.users.length > 0) {
-      userList = this.props.users.map(user => (
-        <div key={user.id}>
-          <input type="radio" name="selectUserId" value={user.id} />
-          <label>{user.name}</label>
-        </div>
-      ));
-    }
-
-    return <div>{userList}</div>;
-  }
-}
+const UserList = ({ user, onSelect }) => {
+  return (
+    <div>
+      <label>
+        <input
+          type="radio"
+          name="selected_user_id"
+          value={user.id}
+          onClick={onSelect}
+        />
+        {user.name}
+      </label>
+    </div>
+  );
+};
 
 export default UserList;
