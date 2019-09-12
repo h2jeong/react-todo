@@ -1,32 +1,53 @@
 import React, { Component } from "react";
-import TodoItem from "./TodoItem";
+import { Link } from "react-router-dom";
 
 class Todos extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      option: "all"
+    };
   }
+
+  _handleChange = e => {
+    this.setState({
+      option: e.target.value
+    });
+  };
 
   render() {
     console.log("Todos rendered", this.props);
-    const { todos } = this.props;
-    const todoList = todos.map(item => <TodoItem item={item} key={item.id} />);
+    const { userId, todos } = this.props;
+    let _todos = Array.from(todos);
+    if (this.state.option === "all") {
+      _todos = todos;
+    } else if (this.state.option === "completed") {
+      _todos = todos.filter(item => item.completed);
+    } else if (this.state.option === "notCompleted") {
+      _todos = todos.filter(item => !item.completed);
+    }
+
+    const todoList = _todos.map(item => <li key={item.id}>{item.title}</li>);
+
     return (
       <div className="todoList">
-        <form action="/todo_select" method="get">
-          <select>
+        <Link to={`/users/${userId}`}>유저프로필</Link>
+        <Link to={`/users/${userId}/todos`}>
+          투두<b>{_todos.length}</b>
+        </Link>
+        <div>
+          <select
+            defalutvalue={this.state.option}
+            onChange={this._handleChange}
+          >
             <option value="all">모든 투두</option>
-            <option value="progress">미완료한 투두</option>
-            <option value="complete">완료한 투두</option>
+            <option value="notCompleted">미완료한 투두</option>
+            <option value="completed">완료한 투두</option>
           </select>
-          <ul>
-            {/* <li>리바운드 연습하기</li>
-            <li>자유투 1000개</li>
-            <li>제자리 드리블 - 완료</li>
-            <li>맨몸 운동 - 완료</li> */}
-            {todoList}
-          </ul>
-        </form>
+          <ul>{todoList}</ul>
+        </div>
+        <Link to="/">Home</Link>
+        <Link to={`/users/${userId}`}>뒤로가기</Link>
       </div>
     );
   }

@@ -8,13 +8,10 @@ import Todos from "./components/Todos";
 import Board from "./components/Board";
 
 class App extends Component {
-  state = {
-    selected_user_id: 1
-  };
+  state = {};
 
   componentDidMount() {
     this._getUsers();
-    this._getTodos(this.state.selected_user_id);
   }
 
   _getUsers() {
@@ -26,27 +23,30 @@ class App extends Component {
       .catch(error => console.log(error));
   }
 
-  _getTodos(id) {
+  _getTodos = id => {
     fetch(`http://koreanjson.com/todos?userId=${id}`)
       .then(response => response.json())
       .then(todos => {
         this.setState({ todos: todos });
       })
       .catch(error => console.log(error));
-  }
+  };
 
-  HandleSelect = e => {
-    console.log(e.target.value);
+  _handleSelect = e => {
+    const selected = Number(e.target.value);
+    const selectedUser = this.state.users ? this.state.users[selected - 1] : {};
+    this._getTodos(selected);
     this.setState({
-      selected_user_id: Number(e.target.value)
+      selected_user_id: selected,
+      selected_user: selectedUser
     });
   };
 
   render() {
-    console.log("App rendered");
-    let _users = this.state.users ? this.state.users : this._getUsers();
+    console.log("app rendered:", this.state);
     let _userId = this.state.selected_user_id;
-    let _todos = this.state.todos ? this.state.todos : this._getTodos(_userId);
+    let _todos = _userId ? this.state.todos : [];
+
     return (
       <div className="App">
         <Route exact path="/" component={Main} />
@@ -56,16 +56,28 @@ class App extends Component {
             path="/users"
             render={() => (
               <Users
-                users={_users}
-                onSelect={this.HandleSelect}
-                selectedUser={_userId}
-                todos={_todos}
+                users={this.state.users}
+                onSelect={this._handleSelect}
+                userId={_userId}
               />
             )}
           />
-          <Route path="/users/:id" component={UserDetail} />
+          <Route
+            exact
+            path="/users/:id"
+            render={() => (
+              <UserDetail
+                userId={_userId}
+                user={this.state.selected_user}
+                todoLength={_todos.length}
+              />
+            )}
+          />
+          <Route
+            path="/users/:id/todos"
+            render={() => <Todos userId={_userId} todos={_todos} />}
+          />
         </Switch>
-        <Route path="/users/:id/todos" component={Todos} />
         <Route path="/board" component={Board} />
       </div>
     );
