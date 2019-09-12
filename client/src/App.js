@@ -11,8 +11,20 @@ class App extends Component {
   state = {};
 
   componentDidMount() {
-    this._getUsers();
+    //this._getUsers();
+    this._callApi()
+      .then(res =>
+        this.setState({
+          users: res
+        })
+      )
+      .catch(err => console.log(err));
   }
+  _callApi = async () => {
+    const response = await fetch("https://koreanjson.com/users");
+    const body = await response.json();
+    return body;
+  };
 
   _getUsers() {
     fetch("https://koreanjson.com/users")
