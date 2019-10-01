@@ -11,7 +11,6 @@ class App extends Component {
   state = {};
 
   componentDidMount() {
-    //this._getUsers();
     this._callApi()
       .then(res =>
         this.setState({
@@ -21,24 +20,18 @@ class App extends Component {
       .catch(err => console.log(err));
   }
   _callApi = async () => {
-    const response = await fetch("https://koreanjson.com/users");
+    const response = await fetch("/api/users");
     const body = await response.json();
+    //console.log("body:", body);
     return body;
   };
 
-  _getUsers() {
-    fetch("https://koreanjson.com/users")
-      .then(response => response.json())
-      .then(users => {
-        this.setState({ users: users });
-      })
-      .catch(error => console.log(error));
-  }
-
   _getTodos = id => {
-    fetch(`http://koreanjson.com/todos?userId=${id}`)
+    fetch("/api/todos")
       .then(response => response.json())
-      .then(todos => {
+      .then(data => {
+        console.log("todos:", data);
+        let todos = data.filter(todo => todo.userId === id);
         this.setState({ todos: todos });
       })
       .catch(error => console.log(error));
